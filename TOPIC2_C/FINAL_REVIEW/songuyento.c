@@ -1,25 +1,28 @@
-/*tim kiem so nguyen to trong mang*/
 #include "array_lib.h"
 
-void songuyento(const int a[], int n){
-    int found = 0;
-    
-    printf("cac so nguyen to trong mang la: \n");
-    for(int i = 0; i<n; i++){
-        int songuyento = 1;
-        if(a[i] < 2){
-            songuyento = 0; //khong phai so nguyen to
-        }else{
-            for(int j = 2; j <= a[i]/2; j++){
-                if(a[i] % j == 0){
-                    songuyento = 0; //khong phai so nguyen to
-                    break;
-                }
-            }
-        }
-        if(songuyento){
-            printf("%d ", a[i]);
+static int laSNT(int value){
+    if (value < 2) {
+        return 0;
+    }
+
+    for (int i = 2; i * i <= value; i++) {
+        if (value % i == 0) {
+            return 0;
         }
     }
-    printf("\n");
+
+    return 1;
+}
+
+int lietkesonguyento(const int a[], int n, int result[]){
+    int count = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (laSNT(a[i])) {
+            result[count] = a[i];
+            count++;
+        }
+    }
+
+    return count;
 }

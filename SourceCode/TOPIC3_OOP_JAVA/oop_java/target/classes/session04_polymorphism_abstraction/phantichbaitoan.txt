@@ -1,0 +1,128 @@
+================================================================================
+          PHÂN TÍCH VÀ BÀI LÀM SESSSION 04:POLYMORPHISM AND ABSTRACTION
+================================================================================
+
+1. ĐỌC VÀ DIỄN GIẢI LẠI ĐỀ
+    Bài tập yêu cầu xây dựng ứng dụng e-commerce chạy trên Console áp dụng 
+    tính Đa hình (Polymorphism) và Tính trừu tượng (Abstraction):
+    - Lớp trừu tượng `Product`: Làm lớp cha chứa các thuộc tính dùng chung (id, name, price).
+    - Lớp con `Electronics` & `Clothing`: Kế thừa `Product` và mở rộng các thuộc tính 
+    riêng (brand cho đồ điện tử, size cho thời trang).
+    - Lớp `Program`: Quản lý danh sách sản phẩm bằng mảng cố định `Product[]` tối đa
+     100 phần tử (MAX = 100), thực hiện các thao tác CRUD cơ bản qua Menu tương tác: 
+     + Thêm sản phẩm
+     + Hiển thị danh sách
+     + Tìm kiếm sản phẩm theo ID.
+
+2. XÁC ĐỊNH INPUT, OUTPUT, CONSTRAINT
+    - Input:
+        + Lựa chọn menu (0: Exit, 1: Add, 2: Display, 3: Find).
+        + Loại sản phẩm cần thêm (1: Electronics, 2: Clothing).
+        + Chi tiết sản phẩm: id (int), name (String), price (double/float), 
+        brand/size (String).  
+
+    - Output:
+        + Thông báo trạng thái (thêm thành công, không tìm thấy, mảng đầy).
+        + Danh sách thông tin sản phẩm được định dạng rõ ràng.
+
+    - Constraints:
+        + Kích thước mảng cố định: MAX = 100 (byte).
+        + Biến đếm số lượng: numOfProduct thuộc kiểu byte.
+        + id phải là số nguyên dương duy nhất.
+        + price phải >= 0.
+        + Chuỗi name, brand(thương hiệu), size không được rỗng.
+
+3. TẠO VÍ DỤ BẰNG TAY
+    - Khởi tạo: products mảng 100 phần tử rỗng, numOfProduct = 0.
+    - Thao tác 1 (Add Electronics):
+        + ID: 101, Name: "Laptop", Price: 1500.0, Brand: "Dell".
+        + Kết quả: products[0] = new Electronics(101, "Laptop", 1500.0, "Dell"), numOfProduct = 1.
+
+    - Thao tác 2 (Add Clothing):
+        + ID: 102, Name: "T-Shirt", Price: 25.0, Size: "XL".
+        + Kết quả: products[1] = new Clothing(102, "T-Shirt", 25.0, "XL"), numOfProduct = 2.
+    - Thao tác 3 (Find Product ID 101):
+        + Trả về đối tượng tại products[0] và in thông tin Laptop Dell.
+
+4. LIỆT KÊ EDGE CASES
+    - Mảng đầy (numOfProduct >= MAX): Báo lỗi không thể thêm mới.
+    - Tìm ID không có trong danh sách: Trả về null và thông báo "Product not found".
+    - Trôi lệnh Scanner: Nhập số (nextInt(), nextDouble()) rồi chuyển sang nhập
+     chuỗi (nextLine()). Giải quyết bằng cách dùng Integer.parseInt(scanner.nextLine()).
+    - Dữ liệu nhập không hợp lệ: Giá âm, chuỗi rỗng -> Yêu cầu nhập lại hoặc bắt exception.
+
+
+
+5. VIẾT GIẢI PHÁP ĐƠN GIẢN BẰNG PSEUDOCODE
+
+        CLASS ABSTRACT Product:
+            FIELDS: id (int), name (String), price (float)
+
+        CLASS Electronics EXTENDS Product:
+            FIELDS: brand (String)
+
+        CLASS Clothing EXTENDS Product:
+            FIELDS: size (String)
+
+        CLASS Program:
+            FIELDS: products (Product[100]), numOfProduct (byte) = 0
+
+            METHOD addProduct(product):
+                IF numOfProduct >= 100: PRINT "Full"
+                ELSE:
+                    products[numOfProduct] = product
+                    numOfProduct++
+                    PRINT "Success"
+
+            METHOD findProduct(id):
+                FOR i FROM 0 TO numOfProduct - 1:
+                    IF products[i].getId() == id: RETURN products[i]
+                RETURN null
+
+6. DRY-RUN BẰNG BẢNG TRACE
+
++------+-----------------+-----------------------------------+-----------------------------+------------------------------------+
+| Bước | Thao tác        | Dữ liệu đầu vào                   | Điều kiện kiểm tra          | Trạng thái hệ thống                |
++------+-----------------+-----------------------------------+-----------------------------+------------------------------------+
+| 1    | Khởi tạo        | -                                 | numOfProduct = 0            | Mảng products rỗng                 |
+| 2    | Add Electronics | ID: 1, Name: Phone, Price: 800... | numOfProduct (0) < 100 (OK) | products[0] = Phone, numOfProduct=1|
+| 3    | Add Clothing    | ID: 2, Name: Jacket, Price: 120.. | numOfProduct (1) < 100 (OK) | products[1] = Jacket, numOfProduct=2|
+| 4    | Find ID 2       | ID: 2                             | products[1].id == 2 (True)  | Trả về products[1] (Jacket)        |
++------+-----------------+-----------------------------------+-----------------------------+------------------------------------+
+
+7. CHỨNG MINH NGẮN GỌN VÌ SAO GIẢI PHÁP ĐÚNG
+    - Đóng gói (Encapsulation): Các thuộc tính được bảo vệ bằng protected/private, 
+    truy cập qua Getter/Setter/Constructor.
+    - Trừu tượng (Abstraction): Lớp Product đại diện chung cho mọi sản phẩm, không 
+    thể khởi tạo trực tiếp mà phải thông qua lớp con.
+    - Đa hình (Polymorphism): Mảng kiểu Product[] chứa được cả Electronics lẫn 
+    Clothing. Khi gọi toString(), Java tự động kích hoạt hàm tương ứng của lớp con
+    thực sự tại thời điểm chạy (Runtime).
+
+8. VIẾT CODE (CHUẨN OOP JAVA)
+ -> xem code ở mục thực hành: Product.java, Clothing.java, Electrics.java và Program.java
+
+9. TẠO TEST CASES
+    - Test Case 1: Thêm Electronics -> ID=10, Name="Smart TV", Price=500.0, 
+    Brand="Sony" -> Báo "Product added successfully."
+    - Test Case 2: Thêm Clothing -> ID=11, Name="Jeans", Price=45.5, Size="32" 
+        -> Báo "Product added successfully."
+    - Test Case 3: Hiển thị tất cả -> Chọn 2 -> In ra thông tin chi tiết của 
+    Smart TV và Jeans.
+    - Test Case 4: Tìm sản phẩm tồn tại -> Chọn 3, nhập ID 10 -> In thông tin 
+    Sony Smart TV.
+    - Test Case 5: Tìm sản phẩm không tồn tại -> Chọn 3, nhập ID 999 -> In "Product 
+    with ID 999 not found!".
+
+10. PHÂN TÍCH ĐỘ PHỨC TẠP
+    - Time Complexity:
+        + addProduct: O(1) do chèn trực tiếp vào vị trí numOfProduct.
+        + displayProducts: O(N) với N = numOfProduct.
+        + findProduct: O(N) do duyệt tuyến tính tìm theo ID.
+    - Space Complexity: O(1) vì sử dụng mảng cố định 100 phần tử trên Heap.
+
+11. REFACTOR SAU KHI TEST ĐÃ PASS
+    - Toàn bộ thao tác nhập từ Scanner dùng Integer.parseInt(scanner.nextLine()) 
+    hoặc Double.parseDouble() để giải quyết triệt để lỗi trôi lệnh.
+    - Phương thức toString() ở các class con tận dụng super.toString() giúp 
+    giảm thiểu trùng lặp mã nguồn (Clean Code).

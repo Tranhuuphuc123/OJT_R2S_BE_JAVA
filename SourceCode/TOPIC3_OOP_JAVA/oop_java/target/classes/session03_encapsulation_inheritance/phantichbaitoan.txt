@@ -1,0 +1,116 @@
+================================================================================
+          PHÂN TÍCH VÀ BÀI LÀM: ANTIQUE SHOP MANAGEMENT SYSTEM
+================================================================================
+
+1. ĐỌC VÀ DIỄN GIẢI LẠI ĐỀ
+    Bài tập yêu cầu xây dựng hệ thống quản lý cửa hàng đồ cổ (Antique Shop) ứng dụng 
+    tính Đóng gói (Encapsulation) và Kế thừa (Inheritance):
+    - Class cha `Item`: Chứa các thông tin chung của món đồ cổ (id, value, creator).
+    - 3 Class con kế thừa từ `Item`:
+    + `Vase` (Lọ hoa): Bổ sung height, material.
+    + `Statue` (Tượng): Bổ sung weight, color.
+    + `Painting` (Tranh): Bổ sung height, width, isWaterColor(mau nuoc), isFramed(khung dong).
+    - Class `ItemList`: Quản lý danh sách các Item bằng mảng cố định (tối đa 100 phần tử), 
+    thực hiện các chức năng: Thêm, Hiển thị tất cả, Tìm theo tác giả, Cập nhật theo ID, 
+    Lọc theo loại (Vase/Statue/Painting).
+    - Class `AntiqueShop`: Chứa hàm `main` hiển thị Menu tương tác với người dùng.
+
+2. XÁC ĐỊNH INPUT, OUTPUT, CONSTRAINT
+    - Input: Lựa chọn menu (1-7) và dữ liệu nhập từ bàn phím cho từng thuộc tính đồ cổ.
+    - Output: Thông báo trạng thái, danh sách đồ cổ hiển thị theo định dạng chuỗi.
+    - Constraints (Ràng buộc dữ liệu):
+        + `id`: Không null, không rỗng và phải duy nhất trong mảng.
+        + `value`: Phải >= 0.
+        + `creator`: Không rỗng.
+        + `height` (Vase/Painting): Trong khoảng [0, 2000].
+        + `material` / `color`: Không rỗng.
+        + `weight` (Statue): Trong khoảng [0, 1000].
+        + `width` (Painting): Trong khoảng [0, 3000].
+        + `MAX`: Mảng lưu tối đa 100 sản phẩm.
+
+3. TẠO VÍ DỤ BẰNG TAY
+    - Thêm Vase: ID="V01", Value=500, Creator="A", Height=150, Material="Ceramic".
+     -> `numOfItem` = 1, `list[0]` lưu đối tượng Vase V01.
+    - Thêm Statue: ID="S01", Value=1000, Creator="B", Weight=200, Color="Bronze".
+     -> `numOfItem` = 2, `list[1]` lưu đối tượng Statue S01.
+    - Tìm kiếm theo Creator "A" -> Trả về Vase V01.
+    - Lọc theo loại "VASE" -> In ra danh sách các Vase trong mảng.
+
+4. LIỆT KÊ EDGE CASES(Edge Case là những tình huống đặc biệt, cực đoan
+    hoặc nằm ngay "ranh giới" của dữ liệu đầu vào)
+
+    - Nhập khoảng trắng/rỗng cho các chuỗi -> Bắt buộc nhập lại.
+    - Nhập giá trị số ngoài phạm vi (ví dụ: height = -10 hoặc height = 2500) -> Bắt nhập lại.
+    - Trôi lệnh khi nhập `Scanner` chuyển từ số sang chuỗi -> Xử lý bằng 
+    `Integer.parseInt(sc.nextLine())` hoặc `Boolean.parseBoolean()`.
+    - Thêm mới khi mảng đầy (`numOfItem >= 100`) -> Báo lỗi và trả về `false`.
+    - Cập nhật / Tìm kiếm trên mảng rỗng -> Báo thông báo phù hợp.
+
+
+5. VIẾT GIẢI PHÁP ĐƠN GIẢN BẰNG PSEUDOCODE
+
+        CLASS Item:
+            FIELDS: protected id, creator (String), value (int)
+            METHOD input(): Read and validate id, value, creator from Scanner.
+
+        CLASS Vase EXTENDS Item:
+            FIELDS: private height (int), material (String)
+            METHOD input(): Super.input(), read & validate height (0..2000), material.
+
+        CLASS ItemList:
+            FIELDS: list[100] (Item), numOfItem = 0
+            METHOD addItem(item):
+                IF numOfItem >= 100 RETURN false
+                list[numOfItem++] = item
+                RETURN true
+            METHOD findItem(creator):
+                FOR i FROM 0 TO numOfItem - 1:
+                    IF list[i].getCreator() EQUALS creator RETURN list[i]
+                RETURN null
+
+
+6. DRY-RUN BẰNG BẢNG TRACE (Thêm 1 Vase & 1 Statue)
+
+    +------+-------------------+-----------------+-----------------------+--------------------------+
+    | Bước | Thao tác          | Biến/Dữ liệu    | Kiểm tra/Điều kiện    | Kết quả / Trạng thái     |
+    +------+-------------------+-----------------+-----------------------+--------------------------+
+    | 1    | Khởi tạo          | numOfItem = 0   | -                     | Mảng rỗng                |
+    | 2    | Thêm Vase V01     | ID="V01", V=500 | height <= 2000 (OK)   | list[0] = Vase V01       |
+    |      |                   |                 | numOfItem = 1         |                          |
+    | 3    | Thêm Statue S01   | ID="S01", V=800 | weight <= 1000 (OK)   | list[1] = Statue S01     |
+    |      |                   |                 | numOfItem = 2         |                          |
+    | 4    | Filter "VASE"     | Type = "VASE"   | list[0] instanceof    | In Vase V01              |
+    |      |                   |                 | Vase -> true          |                          |
+    +------+-------------------+-----------------+-----------------------+--------------------------+
+
+7. CHỨNG MINH NGẮN GỌN VÌ SAO GIẢI PHÁP ĐÚNG
+    - Kế thừa (Inheritance): Tái sử dụng lại các thuộc tính chung (id, value, creator) từ `Item`,
+    giúp code ngắn gọn, tránh lặp lại.
+    - Đa hình (Polymorphism): Mảng `Item[]` chứa được cả `Vase`, `Statue`, `Painting`. Hàm `toString()` 
+    và `input()` được ghi đè (Override) đúng theo loại đối tượng thực tế.
+
+8. VIẾT CODE (CHUẨN OOP JAVA)
+ -> xem cacs file trong package sesssion03_encapsulatin and Inheritance
+
+9. TẠO TEST CASES
+    - Test Case 1: Nhập Vase thành công (ID="V01", Value=200, Creator="Picasso",
+     Height=100, Material="Clay") -> Trả về đúng chuỗi formatted string.
+    - Test Case 2: Nhập Height của Vase vượt giới hạn (ví dụ: -50 hoặc 2500) 
+    -> Yêu cầu nhập lại cho đến khi hợp lệ [0..2000].
+    - Test Case 3: Lọc theo kiểu `displayItemsByType("VASE")` -> Chỉ in ra các 
+    đối tượng `Vase`.
+    - Test Case 4: Cập nhật thông tin ID không có trong danh sách -> Trả về `false` và thông 
+    báo "Item ID not found!".
+
+10. PHÂN TÍCH ĐỘ PHỨC TẠP
+    - Time Complexity:
+        + Thêm phần tử `addItem`: O(1).
+        + Tìm kiếm / Lọc / Cập nhật: O(N) với N là số lượng món đồ cổ hiện có trong mảng.
+    - Space Complexity: O(1) phụ thuộc mảng cố định 100 phần tử trên Memory Heap.
+
+11. REFACTOR SAU KHI TEST ĐÃ PASS
+    - Thay thế toàn bộ `sc.nextInt()` / `sc.nextLine()` thông thường bằng 
+    `Integer.parseInt(sc.nextLine().trim())` nhằm chống trôi lệnh hoàn toàn 
+    khi thao tác trên Console.
+    - Tận dụng toán tử `instanceof` trong `displayItemsByType` để lọc chính 
+    xác kiểu dữ liệu thực tế tại Runtime.

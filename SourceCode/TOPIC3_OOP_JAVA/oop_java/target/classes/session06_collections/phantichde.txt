@@ -1,0 +1,122 @@
+================================================================================
+          PHÂN TÍCH VÀ BÀI LÀM: JAVA COLLECTIONS & OOP - COURSE MANAGEMENT
+================================================================================
+
+1. ĐỌC VÀ DIỄN GIẢI LẠI ĐỀ
+Bài tập yêu cầu xây dựng chương trình Java Console quản lý danh sách khóa học (Course) 
+sử dụng `ArrayList<Course>`. Chương trình được thiết kế theo cấu trúc mô-đun (chia 
+package chuẩn Clean Code):
+- `entities.Course`: Chứa thuộc tính (code, name, status, duration, flag) và 
+getter/setter, toString formatting.
+- `utils.Constants`: Chứa các hằng số cấu hình (Regex, Menu choice, Flag hợp lệ, Format bảng).
+- `utils.ScannerUtil`: Xử lý việc nhập dữ liệu từ bàn phím, tự động bắt lỗi định dạng (Scanner).
+- `utils.Validator`: Kiểm tra dữ liệu hợp lệ (Regex mã khóa học, kiểm tra trùng lặp, kiểm tra
+\ Flag, Duration).
+- `exceptions.ValidationException`: Custom Runtime Exception để báo lỗi validation.
+- `main.CourseManagement`: Lớp chạy chính điều khiển Menu với các chức năng:
+  1. Thêm khóa học mới (Create Course): Nhập đến khi đúng thì thôi.
+  2. Tìm kiếm khóa học (Search): Theo các thuộc tính (code, name, status, duration, flag).
+  3. Hiển thị danh sách khóa học theo Flag (Display by Flag).
+  4. Thoát chương trình (Quit).
+
+2. XÁC ĐỊNH INPUT, OUTPUT, CONSTRAINT
+- Input:
+  + Lựa chọn menu (1, 2, 3, 0).
+  + Mã khóa học (`code`), Tên (`name`), Trạng thái (`status`), Thời lượng (`duration`), 
+  Nhãn (`flag`).
+  + Từ khóa tìm kiếm và thuộc tính tương ứng.
+- Output:
+  + Bảng danh sách khóa học chuẩn hóa đẹp mắt với header (CODE | NAME | STATUS | 
+  DURATION | FLAG).
+  + Thông báo lỗi trực quan khi người dùng nhập sai quy tắc.
+- Constraints (Ràng buộc nghiệp vụ - Business Rules):
+  + `code`: Độ dài 5 ký tự, bắt đầu bằng "RA" và theo sau là 3 chữ số (`^RA\d{3}$`). 
+  Không được trùng lặp (Case-insensitive).
+  + `status`: Chỉ nhận `true` (active) hoặc `false` (in-active).
+  + `flag`: Chỉ nhận 3 giá trị: `'optional'`, `'prerequisite'`, `'N/A'` (không
+   phân biệt hoa thường, lưu dạng chuẩn).
+  + `duration`: Kiểu `short`, phải là số nguyên dương (> 0).
+
+3. TẠO VÍ DỤ BẰNG TAY
+    - Tạo khóa học 1:
+    + Code: `RA001`, Name: "Java Core", Status: `true`, Duration: `40`, Flag: `prerequisite`.
+    + Thỏa mãn tất cả ràng buộc -> Thêm thành công vào `ArrayList`.
+    - Tạo khóa học 2 (Thử nhập sai):
+    + Code: `RA99` -> Báo lỗi "Pattern must be RAxxx.", yêu cầu nhập lại.
+    + Code: `RA001` -> Báo lỗi "Code already exists.", yêu cầu nhập lại.
+    + Code: `RA002`, Name: "ReactJS", Status: `false`, Duration: `-5` -> Báo 
+    lỗi "Must be > 0.", nhập lại `30`. Flag: `optional`.
+    - Tìm kiếm theo Name = "java":
+    + Tìm thấy `RA001` ("Java Core") sử dụng `contains` không phân biệt hoa thường.
+
+4. LIỆT KÊ EDGE CASES
+- Nhập chuỗi rỗng/khoảng trắng: `ScannerUtil` sẽ bắt và yêu cầu nhập lại.
+- Nhập sai định dạng số/boolean khi chọn Menu hoặc nhập Duration: Bắt 
+`NumberFormatException` trong `ScannerUtil`.
+- Nhập Flag khác ngoài `optional`, `prerequisite`, `N/A`: Báo lỗi và bắt nhập lại.
+- Tìm kiếm không ra kết quả nào: Hiển thị thông báo "No courses found."
+- Phân biệt chữ hoa/chữ thường (Case sensitivity): Cần dùng `equalsIgnoreCase` 
+hoặc `toLowerCase()` cho Code, Flag, và Search query.
+
+5. VIẾT GIẢI PHÁP ĐƠN GIẢN BẰNG PSEUDOCODE
+
+CLASS Course:
+    code, name, status, duration, flag
+    toString(): Format bảng %-6s | %-20s | %-6s | %-8d | %-12s
+
+CLASS Validator:
+    validateCode(code) -> code MATCHES "^RA\d{3}$"
+    isDuplicatedCode(code, courses) -> ANY c IN courses HAS c.code == code (ignore case)
+    validateFlag(flag) -> flag IN ["optional", "prerequisite", "N/A"] (ignore case)
+    validateDuration(duration) -> duration > 0
+
+CLASS CourseManagement:
+    courses = ArrayList<Course>()
+    
+    run():
+        LOOP:
+            showMenu()
+            choice = readMenuChoice()
+            SWITCH choice:
+                CASE 1: createCourse()
+                CASE 2: searchCourses()
+                CASE 3: displayByFlag()
+                CASE 0: EXIT
+
+6. DRY-RUN BẰNG BẢNG TRACE
+
++------+---------------------+-----------------------------------+-------------------------------------+-----------------------------------------+
+| Bước | Thao tác            | Input nhập vào                    | Kiểm tra Validator                  | Kết quả / Trạng thái                    |
++------+---------------------+-----------------------------------+-------------------------------------+-----------------------------------------+
+| 1    | Menu 1 (Create)     | Code: "ABC"                       | validateCode("ABC") = false         | Báo lỗi "Pattern must be RAxxx."        |
+| 2    | Re-input Code       | Code: "RA001"                     | validateCode = true, Unique = true  | Chấp nhận Code: "RA001"                 |
+| 3    | Input Duration      | Duration: 0                       | validateDuration(0) = false         | Báo lỗi "Must be > 0."                  |
+| 4    | Re-input Duration   | Duration: 45                      | validateDuration(45) = true         | Chấp nhận Duration: 45                  |
+| 5    | Input Flag          | Flag: "OPTIONAL"                  | validateFlag = true                 | Chuẩn hóa thành "optional", lưu Course  |
++------+---------------------+-----------------------------------+-------------------------------------+-----------------------------------------+
+
+7. CHỨNG MINH NGẮN GỌN VÌ SAO GIẢI PHÁP ĐÚNG
+- Tuân thủ nguyên lý Đóng gói (Encapsulation) và Phân tách trách nhiệm (Single Responsibility Principle): `ScannerUtil` chỉ lo nhập xuất, `Validator` chỉ lo kiểm tra logic, `CourseManagement` điều phối ứng dụng.
+- Sử dụng Java Stream API (`stream()`, `filter()`, `collect()`) giúp code tìm kiếm và lọc dữ liệu ngắn gọn, tối ưu và hiện đại.
+- Vòng lặp `while(true)` kết hợp helper method đảm bảo trải nghiệm người dùng không bị văng ứng dụng khi nhập sai (Robust Input Handling).
+
+8. VIẾT CODE (CHUẨN OOP JAVA)
+ -> coi bai tap code 
+
+ 9. TẠO TEST CASES
+- Case 1: Thêm mới khóa học thành công -> Code: RA001, Name: Java, Status: true, Duration: 30, Flag: optional -> In "Course created!"
+- Case 2: Kiểm tra Regex Code -> Nhập "RA12" hoặc "ABC" -> In "Pattern must be RAxxx."
+- Case 3: Kiểm tra Trùng Code -> Nhập tiếp "RA001" -> In "Code already exists."
+- Case 4: Kiểm tra Flag -> Nhập "abc" -> In "Invalid flag.", nhập "N/A" -> Nhận diện thành công.
+- Case 5: Tìm kiếm theo name -> Nhập "java" -> Trả về danh sách chứa khóa học "Java".
+
+10. PHÂN TÍCH ĐỘ PHỨC TẠP
+- Time Complexity:
+  + Create Course (Check Duplicate Code): O(N) với N là số khóa học hiện có.
+  + Search / Filter by Flag: O(N) do phải duyệt qua danh sách `ArrayList`.
+- Space Complexity: O(N) để lưu trữ danh sách khóa học trong bộ nhớ RAM.
+
+11. REFACTOR SAU KHI TEST ĐÃ PASS
+- Tối ưu hóa việc lọc dữ liệu bằng Java Stream API ngắn gọn.
+- Sử dụng `Constants.TABLE_HEADER` để giữ cho giao diện hiển thị bảng được căn chỉnh đẹp mắt và nhất quán.
+- Đóng gói logic nhập liệu trong `ScannerUtil` giúp mã nguồn ở `CourseManagement` sạch sẽ, không bị rối bởi các khối catch exception.

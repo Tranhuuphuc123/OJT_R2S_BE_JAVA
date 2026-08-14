@@ -1,0 +1,152 @@
+================================================================================
+          PHÂN TÍCH VÀ BÀI LÀM SESSSION 05: EXCEPTION AND ARRAY OF OBJECTS
+================================================================================
+
+1. ĐỌC VÀ DIỄN GIẢI LẠI ĐỀ
+      Bài tập yêu cầu xây dựng chương trình Java quản lý danh sách sản phẩm bằng mảng cố định,
+    kết hợp cơ chế xử lý ngoại lệ (Exception Handling) và tạo Custom Exception:
+    - Lớp `Product`: Đại diện cho đối tượng sản phẩm với các thuộc tính productID, name, 
+    price, quantityInStock.
+    - Lớp Custom Exception `ProductNotFoundException`: Kế thừa từ `Exception`, dùng để ném 
+    ngoại lệ khi tìm kiếm hoặc cập nhật sản phẩm không tồn tại trong hệ thống.
+    - Lớp `ProductManagement`: Quản lý mảng `Product[]` gồm tối đa 10 phần tử, hỗ trợ các chức năng:
+        + Thêm sản phẩm (`addProduct`): Kiểm tra mảng đầy, ID trùng lặp, giá/số lượng âm 
+        (`IllegalArgumentException`).
+        + Lấy thông tin theo ID (`getProductByID`): Ném `ProductNotFoundException` nếu ID không tìm thấy.
+        + Cập nhật số lượng tồn kho (`updateProductQuantity`): Ném `ProductNotFoundException` nếu ID không có, 
+        hoặc `IllegalArgumentException` nếu số lượng mới < 0.
+    - Lớp `Program`: Chứa hàm `main` khởi tạo Menu tương tác từ bàn phím và xử lý ngoại lệ trong các khối
+    `try-catch`.
+
+2. XÁC ĐỊNH INPUT, OUTPUT, CONSTRAINT
+    - Input:
+        + Lựa chọn menu (1: Add Product, 2: Retrieve Product by ID, 3: Update Product Quantity, 4: Exit).
+        + Chi tiết sản phẩm: productID (int), name (String), price (double), quantityInStock (int).
+    - Output:
+        + Thông báo thành công: "Product added successfully.", "Product quantity updated successfully."
+        + Thông báo lỗi qua Exception: "Product with ID [id] not found.", "Price and quantity must 
+        be non-negative."
+        + Thông tin sản phẩm hiển thị thông qua `displayProductInfo()`.
+    - Constraints:
+        + Dung lượng mảng cố định: Tối đa 10 sản phẩm (`Product[10]`).
+        + `productID`: Phải là duy nhất (Unique), không trùng lặp.
+        + `price` và `quantityInStock`: Phải >= 0 (Non-negative). Báo `IllegalArgumentException` 
+        nếu < 0.
+
+3. TẠO VÍ DỤ BẰNG TAY
+    - Khởi tạo: `products` mảng 10 phần tử rỗng, `productCount = 0`.
+    - Thao tác 1 (Add Product):
+        + ID: 101, Name: "Laptop", Price: 999.99, Quantity: 10.
+        + Thỏa mãn: productCount < 10, ID 101 không bị trùng, Price >= 0, Quantity >= 0.
+        + Kết quả: `products[0]` = Product(101, "Laptop", 999.99, 10), `productCount = 1`.
+    - Thao tác 2 (Update Stock ID 101 sang 15):
+        + Tìm ID 101 -> Thấy tại `products[0]`.
+        + Kiểm tra newQuantity = 15 >= 0 -> Hợp lệ.
+        + Cập nhật `quantityInStock = 15`. In "Product quantity updated successfully."
+    - Thao tác 3 (Find Product ID 999):
+        + Tìm ID 999 trong mảng `products[0]` -> Không thấy.
+        + Ném `ProductNotFoundException("Product with ID 999 not found.")`.
+
+4. LIỆT KÊ EDGE CASES(hạn chế phát sinh)
+    - Mảng đầy (`productCount >= 10`): Báo lỗi không thể thêm sản phẩm mới.
+    - Nhập ID đã tồn tại khi thêm mới: Ném `IllegalArgumentException("Product ID 
+    already exists!")`.
+    - Giá âm (`price < 0`) hoặc Số lượng âm (`quantity < 0`): Ném `IllegalArgumentException
+    ("Price and quantity must be non-negative.")`.
+    - Tìm kiếm/Cập nhật ID không tồn tại: Ném `ProductNotFoundException("Product with ID " + 
+    id + " not found.")`.
+    - Lỗi định dạng nhập liệu (String nhập vào biến số int/double): Bắt `NumberFormatException`
+     tại Menu.
+
+
+
+5. VIẾT GIẢI PHÁP ĐƠN GIẢN BẰNG PSEUDOCODE
+
+            CLASS Product:
+                FIELDS: productID (int), name (String), price (double), quantityInStock (int)
+                METHOD displayProductInfo():
+                    PRINT productID, name, price, quantityInStock
+
+            CLASS ProductNotFoundException EXTENDS Exception:
+                CONSTRUCTOR(message):
+                    SUPER(message)
+
+            CLASS ProductManagement:
+                FIELDS: products (Product[10]), productCount = 0
+
+                METHOD addProduct(product):
+                    IF productCount >= 10 RETURN Error
+                    IF product.price < 0 OR product.quantityInStock < 0:
+                        THROW IllegalArgumentException("Price and quantity must be non-negative.")
+                    FOR i FROM 0 TO productCount - 1:
+                        IF products[i].productID == product.productID:
+                            THROW IllegalArgumentException("Product ID already exists!")
+                    products[productCount++] = product
+
+                METHOD getProductByID(id):
+                    FOR i FROM 0 TO productCount - 1:
+                        IF products[i].productID == id: RETURN products[i]
+                    THROW ProductNotFoundException("Product with ID " + id + " not found.")
+
+                METHOD updateProductQuantity(id, newQuantity):
+                    IF newQuantity < 0:
+                        THROW IllegalArgumentException("Price and quantity must be non-negative.")
+                    Product p = getProductByID(id) // Sẽ ném ProductNotFoundException nếu không thấy
+                    p.quantityInStock = newQuantity
+
+6. DRY-RUN BẰNG BẢNG TRACE
+
++------+------------------------+-------------------------------------+-----------------------------------+---------------------------------------------+
+| Bước | Thao tác               | Dữ liệu đầu vào                     | Điều kiện kiểm tra                | Trạng thái / Kết quả                        |
++------+------------------------+-------------------------------------+-----------------------------------+---------------------------------------------+
+| 1    | Khởi tạo               | -                                   | productCount = 0                  | Mảng products[10] rỗng                      |
+| 2    | addProduct             | ID: 101, Laptop, 999.99, Qty: 10    | Valid input & Unique ID (OK)      | products[0] = Laptop, productCount = 1      |
+| 3    | addProduct             | ID: 102, Phone, -50.0, Qty: 5       | Price = -50.0 < 0                 | Throw IllegalArgumentException              |
+| 4    | getProductByID         | ID: 999                             | Loop i=0 -> products[0].id != 999 | Throw ProductNotFoundException              |
+| 5    | updateProductQuantity  | ID: 101, NewQty: 15                 | ID 101 exists, NewQty >= 0 (OK)   | Laptop.quantityInStock = 15                 |
++------+------------------------+-------------------------------------+-----------------------------------+---------------------------------------------+
+
+7. CHỨNG MINH NGẮN GỌN VÌ SAO GIẢI PHÁP ĐÚNG
+    - Tính Đóng gói (Encapsulation): Các trường dữ liệu trong `Product` để `private`,
+     sử dụng Getter/Setter chuẩn.
+    - Bắt lỗi chủ động (Validation & Exception): Bắt lỗi ngay tại nguồn dữ liệu bằng 
+    `IllegalArgumentException` và `ProductNotFoundException`, ngăn ngừa việc hệ thống mang dữ liệu sai logic.
+    - Tái sử dụng logic (Code Reuse): Phương thức `updateProductQuantity` tận dụng lại `getProductByID` để 
+    tìm sản phẩm, giúp code gọn gàng, không bị lặp vòng lặp `for`.
+
+
+
+8. VIẾT CODE (CHUẨN OOP JAVA)
+ -> coi phần code: 
+    + Product.java
+    + ProductNotFoundException.java
+    + ProductManagement.java 
+    + Program.java
+
+
+9. TẠO TEST CASES
+    - Test Case 1 (Add thành công): ID=101, Laptop, Price=999.99, 
+    Stock=10 -> Output: "Product added successfully."
+    - Test Case 2 (Add với Price/Qty âm): ID=102, Phone, Price=-500, 
+    Stock=5 -> Output: "Price and quantity must be non-negative."
+    - Test Case 3 (Retrieve ID không tồn tại): Tìm ID=999 -> Output: 
+    "Product with ID 999 not found."
+    - Test Case 4 (Retrieve ID tồn tại): Tìm ID=101 -> Output: Hiển
+     thị đầy đủ thông tin Laptop.
+    - Test Case 5 (Update Qty hợp lệ): Update ID=101 thành Qty=15 
+    -> Output: "Product quantity updated successfully."
+    - Test Case 6 (Update Qty âm): Update ID=101 thành Qty=-5 
+    -> Output: "Price and quantity must be non-negative."
+
+10. PHÂN TÍCH ĐỘ PHỨC TẠP
+    - Time Complexity:
+        + addProduct: O(N) do phải duyệt mảng kiểm tra ID trùng lặp trước khi thêm mới (với N <= 10).
+        + getProductByID: O(N) do duyệt tuyến tính mảng để tìm ID.
+        + updateProductQuantity: O(N) gọi hàm getProductByID.
+    - Space Complexity: O(1) do sử dụng mảng cố định 10 phần tử.
+
+11. REFACTOR SAU KHI TEST ĐÃ PASS
+    - Tái sử dụng phương thức `getProductByID(id)` bên trong `updateProductQuantity()` 
+    để tuân thủ nguyên tắc DRY (Don't Repeat Yourself).
+    - Sử dụng `Integer.parseInt(scanner.nextLine())` để phòng tránh lỗi trôi dòng 
+    Scanner khi tương tác Console.

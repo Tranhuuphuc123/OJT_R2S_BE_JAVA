@@ -1,0 +1,174 @@
+================================================================================
+                PHÂN TÍCH VÀ BÀI LÀM ASSIGNMENT JAVA OOP (CLASS & OBJECT)
+================================================================================
+
+--------------------------------------------------------------------------------
+BÀI LAB 01: TÍNH DIỆN TÍCH HÌNH TRÒN (CIRCLE)
+--------------------------------------------------------------------------------
+1. ĐỌC VÀ DIỄN GIẢI LẠI ĐỀ
+    - Tạo lớp Circle để đại diện cho hình tròn chứa bán kính và phương thức tính 
+    diện tích. Tạo lớp Test chứa hàm main() để khởi tạo một hình tròn bán kính = 12 
+    và in diện tích ra màn hình.
+
+2. XÁC ĐỊNH INPUT, OUTPUT, CONSTRAINT
+    - Input: Bán kính r = 12.0 (kiểu double).
+    - Output: Chuỗi thông báo diện tích định dạng 2 chữ số thập phân: 
+    "Area of the circle 452.39".
+    - Constraint: Bán kính không âm (r >= 0).
+    
+
+3. TẠO VÍ DỤ BẰNG TAY
+    - Công thức: S = PI * r^2
+    - Tính toán: S = 3.1415926535... * 12^2 = 3.1415926535... * 144 = 452.38934... ~ 452.39
+
+4. LIỆT KÊ EDGE CASES(Edge Case là những tình huống đặc biệt, cực đoan
+ hoặc nằm ngay "ranh giới" của dữ liệu đầu vào)
+    - r = 0: Diện tích phải bằng 0.00.
+    - r < 0: Cần xử lý không gán giá trị âm cho bán kính (dùng Setter).
+
+5. VIẾT GIẢI PHÁP ĐƠN GIẢN BẰNG PSEUDOCODE
+ -> Pseudocode (Mã giả) là cách mô tả các bước xử lý của thuật toán 
+ bằng ngôn ngữ tự nhiên (như tiếng Việt hay tiếng Anh) kết hợp với
+ một vài từ khóa lập trình cơ bản, giúp bạn phác thảo logic chương 
+ trình trước khi gõ code Java thật.
+
+
+                CLASS Circle:
+                    PRIVATE radius: double
+                    CONSTRUCTOR(r): Set radius = r
+                    METHOD getArea(): RETURN Math.PI * radius * radius
+
+                CLASS Test:
+                    METHOD main():
+                        c = NEW Circle(12)
+                        PRINT FORMAT "Area of the circle %.2f", c.getArea()
+
+
+
+6. DRY-RUN BẰNG BẢNG TRACE
+ -> Dry-run bằng bảng Trace là kỹ thuật chạy thử thuật toán trên giấy 
+ (chạy bằng mắt và tư duy, không cần bật máy tính) và dùng một bảng ghi
+  chép để theo dõi sự biến đổi dữ liệu qua từng bước.
+
++------+-----------------+----------+--------------------------+----------------------------+
+| Bước | Biến/Đối tượng  | Giá trị  | Hành động                | Kết quả mong đợi           |
++------+-----------------+----------+--------------------------+----------------------------+
+|  1   | circle          | null     | Khởi tạo new Circle()    | Cấp phát vùng nhớ          |
+|  2   | circle.radius   | 12.0     | Gán bán kính = 12        | radius lưu 12.0            |
+|  3   | circle.getArea()| N/A      | Tính Math.PI * 12^2      | Trả về 452.3893...         |
+|  4   | In màn hình     | N/A      | Định dạng %.2f           | "Area of the circle 452.39"|
++------+-----------------+----------+--------------------------+----------------------------+
+
+7. CHỨNG MINH NGẮN GỌN VÌ SAO GIẢI PHÁP ĐÚNG
+    - Phương thức getArea() áp dụng đúng công thức toán học S = PI * r^2 thông qua 
+    hằng số Math.PI và hàm Math.pow() có sẵn của Java, đảm bảo độ chính xác số học.
+
+8. VIẾT CODE (CHUẨN OOP)
+ -> phần này coi bài tập các file Circle.java và Test.java
+
+9. TẠO TEST CASES
+    - Test Case 1: r = 12 -> Output: Area of the circle 452.39 (Pass)
+    - Test Case 2: r = 0  -> Output: Area of the circle 0.00 (Pass)
+    - Test Case 3: r = -5 -> Setter gán thành 0 -> Output: Area of the circle 0.00 (Pass)
+
+10. PHÂN TÍCH ĐỘ PHỨC TẠP
+    - Độ phức tạp thời gian (Time Complexity): O(1) - Tính toán số học đơn giản.
+    - Độ phức tạp không gian (Space Complexity): O(1) - Chỉ tốn dung lượng cho 1 đối tượng.
+
+11. REFACTOR SAU KHI TEST ĐÃ PASS
+    - Đã tối ưu đóng gói private cho thuộc tính radius và xử lý ràng buộc trong setRadius().
+
+    
+--------------------------------------------------------------------------------
+BÀI LAB 02: QUẢN LÝ DANH SÁCH SINH VIÊN (STUDENT MANAGEMENT)
+--------------------------------------------------------------------------------
+1. ĐỌC VÀ DIỄN GIẢI LẠI ĐỀ
+    - Xây dựng ứng dụng Menu cho phép quản lý tối đa 100 sinh viên lưu trong một 
+    mảng đối tượng Student[]. 
+    - Hệ thống có 5 chức năng: 
+        + Thêm mới
+        + Hiển thị danh sách
+        + Tìm theo ID
+        + Cập nhật theo ID
+        + Thoát.
+
+2. XÁC ĐỊNH INPUT, OUTPUT, CONSTRAINT
+    - Input: Lựa chọn menu (1-5), thông tin sinh viên (id, name, age, address, gender, email).
+    - Output: Danh sách sinh viên, kết quả tìm kiếm, trạng thái cập nhật.
+    - Constraints(rang buoc):
+        + Mảng chứa tối đa 100 sinh viên.
+        + id không được trùng lặp.
+        + age >= 18.
+        + gender phải là "male" hoặc "female" neu khong thi bao loi.
+        + name không được để trống (!name.trim().isEmpty()).
+
+3. TẠO VÍ DỤ BẰNG TAY
+    - Thêm sinh viên: ID = "SV01", Name = "Nguyen Van A", Age = 20, Gender = "male".
+    - Search ID "SV01" -> Trả về thông tin sinh viên A.
+    - Search ID "SV99" -> Thông báo "Không tìm thấy".
+
+4. LIỆT KÊ EDGE CASES(Edge Case là những tình huống đặc biệt, cực đoan
+ hoặc nằm ngay "ranh giới" của dữ liệu đầu vào)
+    - Thêm sinh viên khi mảng đã đầy (đủ 100 phần tử).
+    - Nhập ID trùng khi thêm mới.
+    - Nhập tuổi < 18 hoặc giới tính không phải male/female.
+    - Tìm kiếm/Cập nhật khi danh sách chưa có sinh viên nào.
+
+5. VIẾT GIẢI PHÁP ĐƠN GIẢN BẰNG PSEUDOCODE
+(cach viet bang tay tren giay mo ta code)
+    
+     CLASS Student: 
+            fields (id, name, age, address, gender, email)
+
+    ARRAY listStudents = NEW Student[100]
+    INT count = 0
+
+    LOOP:
+        SHOW MENU (1. Create, 2. Display, 3. Find, 4. Update, 5. Quit)
+        READ choice
+        SWITCH choice:
+            CASE 1:
+                IF count >= 100 THEN PRINT "Full"
+                ELSE: READ info -> VALIDATE -> listStudents[count++] = NEW Student
+            CASE 2:
+                FOR i = 0 TO count-1: PRINT listStudents[i]
+            CASE 3:
+                READ searchId -> FIND index -> IF found PRINT ELSE "Not found"
+            CASE 4:
+                READ updateId -> FIND index -> IF found UPDATE info
+            CASE 5:
+                EXIT PROGRAM
+
+6. DRY-RUN BẰNG BẢNG TRACE
++----------+---------------+------------------------------+---------------------+-----------------------------------+
+| Thao tác | count ban đầu | Dữ liệu nhập                 | Kiểm tra Validation | count sau thao tác                |
++----------+---------------+------------------------------+---------------------+-----------------------------------+
+| Thêm SV1 | 0             | ID: S01, Age: 20, Gen: male  | Hợp lệ              | 1 (listStudents[0] giữ SV1)       |
+| Thêm SV2 | 1             | ID: S01 (Trùng)              | Vi phạm ID          | 1 (Yêu cầu nhập lại)              |
+| Hiển thị | 1             | N/A                          | Duyệt từ 0 đến 0    | In thông tin listStudents[0]      |
++----------+---------------+------------------------------+---------------------+-----------------------------------+
+
+7. CHỨNG MINH NGẮN GỌN VÌ SAO GIẢI PHÁP ĐÚNG
+    - Mảng Student[100] kết hợp với biến đếm count kiểm soát chính xác số lượng 
+    thực tế. Các logic validation chèn trực tiếp trước bước khởi tạo đối tượng 
+    đảm bảo toàn vẹn dữ liệu.
+
+8. VIẾT CODE (CHUẨN OOP)
+ -> Phan nay coi bai tap Student.java, StudentManager.java
+
+
+9. TẠO TEST CASES
+    - Test 1 (Validation): Nhập Tuổi = 16 -> Báo lỗi Age must be >= 18!
+    - Test 2 (Duplicate ID): Nhập ID S1 hai lần -> Báo lỗi ID already exists!
+    - Test 3 (Search/Update): Nhập ID không tồn tại -> Báo lỗi Student not found!
+
+10. PHÂN TÍCH ĐỘ PHỨC TẠP
+    - Time Complexity:
+    + Thêm mới: O(N) do duyệt mảng tìm trùng ID (N <= 100).
+    + Tìm kiếm / Cập nhật: O(N).
+    + Hiển thị tất cả: O(N).
+    - Space Complexity: O(N) với N = 100 cố định cho mảng listStudents.
+
+11. REFACTOR SAU KHI TEST ĐÃ PASS
+    - Sử dụng Integer.parseInt(sc.nextLine()) để tránh triệt để lỗi nuốt dòng 
+    trôi lệnh trong Scanner khi chuyển từ đọc số sang đọc chuỗi.

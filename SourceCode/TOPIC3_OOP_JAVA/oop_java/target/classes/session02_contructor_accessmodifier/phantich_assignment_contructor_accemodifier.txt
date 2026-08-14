@@ -1,0 +1,215 @@
+================================================================================
+          PHÂN TÍCH SESSSION 02: CONSTRUCTORS & ACCESS MODIFIERS
+================================================================================
+
+---------------------------------------------------------
+BÀI LAB 01: CONSTRUCTOR
+---------------------------------------------------------
+
+    1. ĐỌC VÀ DIỄN GIẢI LẠI ĐỀ
+        Thiết kế 2 lớp theo sơ đồ UML:
+        - Lớp Book: Đại diện cho quyển sách, chứa 3 thuộc tính (title, author, publicationYear)
+        và 1 Constructor truyền tham số để khởi tạo dữ liệu ngay khi tạo đối tượng.
+        - Lớp Library: Chứa phương thức displayBookInfo(Book book) để nhận một đối tượng sách
+        và in thông tin, cùng hàm main() khởi tạo 3 đối tượng sách khác nhau và in ra màn hình.
+
+    2. XÁC ĐỊNH INPUT, OUTPUT, CONSTRAINT
+        - Input: Dữ liệu khởi tạo cho 3 đối tượng Book (title, author, publicationYear).
+        - Output: Thông tin chi tiết của 3 quyển sách được in ra Console.
+        - Constraints:
+        + Dùng đúng Constructor truyền 3 tham số Book(String, String, int).
+        + In ấn thông qua phương thức displayBookInfo(Book book) của lớp Library.
+
+    3. TẠO VÍ DỤ BẰNG TAY
+        - Tạo b1: Title = "Java Core", Author = "James Gosling", Year = 1995.
+        - Tạo b2: Title = "Clean Code", Author = "Robert C. Martin", Year = 2008.
+        - Tạo b3: Title = "Design Patterns", Author = "Erich Gamma", Year = 1994.
+        - Gọi displayBookInfo(b1) -> Màn hình in: "Title: Java Core | Author: James Gosling | Year: 1995"
+
+    4. LIỆT KÊ EDGE CASES(Edge Case là những tình huống đặc biệt, cực đoan
+    hoặc nằm ngay "ranh giới" của dữ liệu đầu vào)
+        - Đối tượng truyền vào hàm displayBookInfo(book) bị null (dẫn đến NullPointerException).
+        - Tên sách hoặc tác giả bị rỗng/null.
+        - Năm xuất bản mang giá trị âm hoặc lớn hơn năm hiện tại.
+
+    5. VIẾT GIẢI PHÁP ĐƠN GIẢN BẰNG PSEUDOCODE
+    (giải pháp viết tay phác thảo kiểu viết code nháp trên giấy)
+        
+            CLASS Book:
+                FIELDS: title (String), author (String), publicationYear (int)
+                CONSTRUCTOR(t, a, y):
+                    title = t, author = a, publicationYear = y
+
+            CLASS Library:
+                METHOD displayBookInfo(book):
+                    IF book IS NULL THEN PRINT "Book object is null!"
+                    ELSE PRINT book.title + book.author + book.publicationYear
+
+                METHOD main():
+                    b1 = NEW Book("Java Core", "James Gosling", 1995)
+                    b2 = NEW Book("Clean Code", "Robert C. Martin", 2008)
+                    b3 = NEW Book("Design Patterns", "Erich Gamma", 1994)
+
+                    displayBookInfo(b1)
+                    displayBookInfo(b2)
+                    displayBookInfo(b3)
+
+
+    6. DRY-RUN BẰNG BẢNG TRACE
+
+        +------+-------------------+------------------------------------+-----------------------+--------------------------+
+        | Bước | Biến / Đối tượng  | Giá trị khởi tạo                   | Thao tác              | Kết quả mong đợi         |
+        +------+-------------------+------------------------------------+-----------------------+--------------------------+
+        |  1   | b1                | Title="Java Core", Year=1995...    | new Book(...)         | Cấp phát vùng nhớ b1     |
+        |  2   | b2                | Title="Clean Code", Year=2008...   | new Book(...)         | Cấp phát vùng nhớ b2     |
+        |  3   | b3                | Title="Design Patterns", Year=1994 | new Book(...)         | Cấp phát vùng nhớ b3     |
+        |  4   | displayBookInfo(b1)| Đối tượng b1                       | Truy cập dữ liệu b1   | In thông tin sách 1      |
+        |  5   | displayBookInfo(b2)| Đối tượng b2                       | Truy cập dữ liệu b2   | In thông tin sách 2      |
+        |  6   | displayBookInfo(b3)| Đối tượng b3                       | Truy cập dữ liệu b3   | In thông tin sách 3      |
+        +------+-------------------+------------------------------------+-----------------------+--------------------------+
+
+    7. CHỨNG MINH NGẮN GỌN VÌ SAO GIẢI PHÁP ĐÚNG
+        - Thiết kế đúng nguyên lý đóng gói (Encapsulation) của OOP: Thuộc tính được đóng gói 
+        nguyên khối qua Constructor.
+        - Phương thức displayBookInfo nhận trực tiếp đối tượng Book thể hiện tính linh hoạt 
+        khi truyền tham chiếu trong Java.
+
+    8. VIẾT CODE (CHUẨN OOP)
+    -> xem hai file book.java vaf library.jav
+
+    9. TẠO TEST CASES
+        - Test Case 1 (Thông thường): Khởi tạo 3 đối tượng hợp lệ -> In đủ 3 dòng thông tin.
+        - Test Case 2 (Null Object): Gọi library.displayBookInfo(null) -> In "Book object is null!" 
+        thay vì sập chương trình.
+
+    10. PHÂN TÍCH ĐỘ PHỨC TẠP
+        - Time Complexity: O(1) - Khởi tạo và in 3 đối tượng cố định.
+        - Space Complexity: O(1) - Bộ nhớ tốn cho 3 đối tượng Book và 1 đối tượng Library.
+
+    11. REFACTOR SAU KHI TEST ĐÃ PASS
+        - Đã thêm kiểm tra `if (book == null)` tránh lỗi Crash program(NullPointerException).
+        - Dùng từ khóa `private` cho thuộc tính và cung cấp `Getter` đúng chuẩn OOP.
+
+
+***************************************************************************************************
+
+---------------------------------------------------------
+BÀI LAB 02: ACCESS MODIFIERS
+---------------------------------------------------------
+
+    1. ĐỌC VÀ DIỄN GIẢI LẠI ĐỀ
+        Bài tập yêu cầu xây dựng hệ thống quản lý thực tập sinh (Trainee) gồm 3 lớp chính:
+        - Lớp Trainee: Mô hình hóa thực tập sinh với các thuộc tính ẩn (private) gồm id, name, 
+        gender, age. Yêu cầu tính đóng gói (Encapsulation) thông qua Getter/Setter kèm quy tắc
+        ràng buộc dữ liệu (Validation).
+        - Lớp TraineeForm: Chịu trách nhiệm nhập liệu từ bàn phím (Scanner), đảm bảo dữ liệu 
+        nhập vào luôn hợp lệ trước khi tạo đối tượng Trainee.
+        - Lớp TrainingManagement: Quản lý danh sách thực tập sinh bằng mảng cố định (tối đa 100),
+        cung cấp Menu điều khiển cho phép: Thêm, Hiển thị, Tìm kiếm theo ID/Tên, Cập nhật và Thoát.
+
+    2. XÁC ĐỊNH INPUT, OUTPUT, CONSTRAINT
+        - Input: Các thao tác chọn Menu (1-6) và thông tin thực tập sinh (id, name, gender, age) 
+        được nhập từ bàn phím.
+        - Output: Danh sách thực tập sinh, kết quả tìm kiếm, thông báo thành công hoặc lỗi Validation.
+        - Constraints(rang buoc):
+            + Mảng lưu trữ tối đa 100 phần tử (`listOfTrainees: Trainee[100]`, biến đếm `count: byte`).
+            + `id`: Không được rỗng, không chứa khoảng trắng thừa và phải duy nhất trong hệ thống.
+            + `name`: Không được rỗng.
+            + `gender`: Chỉ chấp nhận "male" hoặc "female" (không phân biệt hoa/thường).
+            + `age`: Phải là số nguyên >= 6.
+
+    3. TẠO VÍ DỤ BẰNG TAY
+        - Thêm thực tập sinh 1: ID = "T01", Name = "Nguyen Van A", Gender = "male", Age = 20.
+         -> `count = 1`, `listOfTrainees[0]` lưu T01.
+        - Thêm thực tập sinh 2: Nhập ID = "T01" trùng lặp.
+         -> Báo lỗi "ID already exists!", yêu cầu nhập lại hoặc hủy.
+        - Thêm thực tập sinh 2 hợp lệ: ID = "T02", Name = "Tran Thi B", Gender = "female", Age = 22.
+         -> `count = 2`, `listOfTrainees[1]` lưu T02.
+        - Tìm kiếm ID "T01" -> Trả về thực tập sinh Nguyen Van A.
+
+    4. LIỆT KÊ EDGE CASES(Edge Case là những tình huống đặc biệt, cực đoan
+    hoặc nằm ngay "ranh giới" của dữ liệu đầu vào)
+        - Nhập khoảng trắng trống ("   ") ở ID hay Name -> Cần trim() và bắt nhập lại.
+        - Giới tính nhập ngoài "male"/"female" (ví dụ "unknown", "123") -> Yêu cầu nhập lại.
+        - Tuổi nhập < 6 hoặc nhập chữ cái thay vì số -> Bắt ngoại lệ `InputMismatchException` 
+        / `NumberFormatException`.
+        - Thêm mới khi mảng đã đầy (count = 100) -> Báo lỗi "List is full".
+        - Tìm kiếm hoặc Cập nhật khi danh sách rỗng (count = 0) -> Báo "List is empty".
+        - Cập nhật một ID không tồn tại -> Báo "Trainee not found".
+
+    5. VIẾT GIẢI PHÁP ĐƠN GIẢN BẰNG PSEUDOCODE
+
+        CLASS Trainee:
+            FIELDS: id, name, gender (String), age (byte)
+            SETTER setId(val): IF val IS EMPTY THEN THROW ERROR ELSE id = val.trim()
+            SETTER setGender(val): IF val NOT IN ["male", "female"] THEN THROW ERROR ELSE gender = val
+            SETTER setAge(val): IF val < 6 THEN THROW ERROR ELSE age = val
+
+        CLASS TraineeForm:
+            METHOD getId(): READ String UNTIL NOT EMPTY, RETURN id
+            METHOD getTrainee(): READ name, gender, age (validate each), 
+                   RETURN new Trainee("TEMP", name, gender, age)
+
+        CLASS TrainingManagement:
+            ARRAY listOfTrainees[100], count = 0    
+
+            METHOD addTrainee():
+                IF count >= 100 THEN PRINT "Full capacity"; RETURN
+                id = traineeForm.getId()
+                IF findTraineeById(id) != NULL THEN PRINT "ID exists!"; RETURN
+                trainee = traineeForm.getTrainee()
+                trainee.setId(id)
+                listOfTrainees[count] = trainee
+                count = count + 1
+
+            METHOD findTraineeById(id):
+                FOR i FROM 0 TO count - 1:
+                    IF listOfTrainees[i].getId() EQUALS id THEN RETURN listOfTrainees[i]
+                RETURN NULL
+
+
+
+    6. DRY-RUN BẰNG BẢNG TRACE (Luồng Thêm mới & Kiểm tra trùng ID)
+
+    +------+-------------------+-----------------+-----------------------+--------------------------+
+    | Bước | Thao tác          | Biến/Dữ liệu    | Kiểm tra/Điều kiện    | Kết quả / Trạng thái     |
+    +------+-------------------+-----------------+-----------------------+--------------------------+
+    | 1    | Khởi tạo          | count = 0       | -                     | Mảng rỗng                |
+    | 2    | Nhập ID           | id = "T01"      | findTraineeById = null| ID chưa tồn tại (Hợp lệ) |
+    | 3    | Nhập thông tin    | Name="An",...   | age >= 6, gender ok   | Tạo Trainee temp         |
+    | 4    | Lưu vào mảng      | count = 0 -> 1  | listOfTrainees[0]=T01 | Lưu thành công           |
+    | 5    | Thêm tiếp ID "T01"| id = "T01"      | findTraineeById != null| Báo lỗi "ID trùng", dừng |
+    +------+-------------------+-----------------+-----------------------+--------------------------+
+
+    7. CHỨNG MINH NGẮN GỌN VÌ SAO GIẢI PHÁP ĐÚNG
+        - Tuân thủ nguyên lý Đóng gói (Encapsulation): Toàn bộ dữ liệu 
+        được bảo vệ qua private và chỉ cho sửa đổi khi thông qua setter 
+        có logic Validation.
+        - Phân tách trách nhiệm (Single Responsibility Principle): `Trainee` 
+        giữ dữ liệu, `TraineeForm` chịu trách nhiệm I/O giao diện, 
+        `TrainingManagement` chịu trách nhiệm xử lý logic nghiệp vụ.
+
+
+    8. VIẾT CODE (CHUẨN OOP JAVA)
+    -> coi bai Trainee.java, TraineeForm.java va TrainingManagement.java
+
+
+    9. TẠO TEST CASES
+        - Test Case 1: Thêm Trainee hợp lệ (ID="T01", Name="An", Gender="male", Age=20) -> Thành công.
+        - Test Case 2: Thêm trùng ID="T01" -> Báo lỗi "Trainee ID already exists!".
+        - Test Case 3: Nhập sai định dạng tuổi (nhập "abc" hoặc -5) -> Yêu cầu nhập lại, không crash app.
+        - Test Case 4: Tìm kiếm tên tương đối (Tìm "An" ra cả "Nguyen Van An" và "An Tran") -> Trả về
+         danh sách mảng khớp.
+
+    10. PHÂN TÍCH ĐỘ PHỨC TẠP
+        - Time Complexity:
+            + Thêm mới / Tìm theo ID / Cập nhật: O(N) do duyệt mảng để kiểm tra ID (với N <= 100).
+            + Tìm theo Tên: O(N) duyệt 2 lần qua mảng.
+            + Hiển thị danh sách: O(N).
+        - Space Complexity: O(N) lưu mảng cố định 100 phần tử trên Heap Memory.
+
+    11. REFACTOR SAU KHI TEST ĐÃ PASS
+        - Xử lý triệt để trôi lệnh `Scanner` bằng cách dùng nhất quán `scanner.nextLine()` 
+        và ép kiểu qua `Byte.parseByte()` / `Integer.parseInt()`.
+        - Phương thức `findTraineeByName` trả về mảng dynamic size vừa đủ kết quả tìm kiếm
+         thay vì mảng thừa 100 phần tử.

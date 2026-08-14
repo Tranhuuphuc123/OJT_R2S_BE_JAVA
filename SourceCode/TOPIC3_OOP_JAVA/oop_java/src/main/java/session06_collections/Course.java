@@ -4,8 +4,8 @@ public class Course {
     private String code;
     private String name;
     private boolean status;
-    private short duration;
-    private String flag;
+    private short duration; // thoi luong
+    private String flag; // nhan khoa hoc
 
     public Course() {
     }
